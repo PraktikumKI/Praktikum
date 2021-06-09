@@ -4,9 +4,9 @@ import pickle
 import minesweeperheadless
 
 # Learning Parameters
-rewardAlive = 0
-rewardKill = 0
-rewardWin = 0
+rewardAlive = 0 #Belohung im fall das der Agent keine Mine getroffen hat
+rewardKill = 0 #Belohung im fall das der Agent eine Mine getroffen hat
+rewardWin = 0 #Belohung im fall das der Agent ein Spiel gewonnen hat
 alpha = 0
 gamma = 0
 
@@ -64,6 +64,7 @@ def evaluate():
     #  save Methode nach einer gewissen Anzahl von Spielen auf. In dieser Methode
     #  werden die Evaluationsdaten in cords aufgenommen.
     cords.append(["""Spieleanzahl, Gewinnwahrscheinlichkeit"""])
+
     pass
 
 
@@ -101,7 +102,9 @@ def shouldEmulateMove(params):
     #  Methode immer den Aktuellen State, das Aktuelle Spielfeld und die
     #  gewählte Aktion für den Nächsten Zug. Diese Methode Aktualisiert
     #  also immer den Vorgängerstate.
+
     pos = np.empty(dtype=int, shape=2)  # steht symbolisch für die Position die eigentlich übergeben wird
+
     return pos
 
 

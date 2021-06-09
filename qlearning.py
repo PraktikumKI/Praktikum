@@ -1,3 +1,4 @@
+from random import random
 import numpy as np
 from collections import defaultdict
 import pickle
@@ -14,8 +15,8 @@ alpha = 0.02
 gamma = 0.6
 
 # Global Parameters
-intervallsize: int = 1000
-namespace = "Q121231"
+intervallsize: int = 10000
+namespace = "Q420"
 oldState = None
 oldAction = (None, None)
 oldParams = np.zeros(shape=(length, width), dtype=int)
@@ -46,6 +47,23 @@ def load(datei):
     with open("Q_Evo/" + str(namespace) + "_evodata.pickle", "rb") as file:
        cords = pickle.load(file)
 
+
+def picktest(reward, params):
+    sum = 0
+    rNum = random.random()
+    for x in range(0, np.array(reward).shape[0]):
+        for y in range(0, np.array(reward).shape[1]):
+            if params[x][y] == 0:
+                sum = sum+reward[x][y]+10000
+    for x in range(0, np.array(reward).shape[0]):
+        for y in range(0, np.array(reward).shape[1]):
+            if params[x][y] == 0:
+                if rNum < (reward[x][y]+10000)/sum:
+                    return np.array([x, y])
+                else:
+                    rNum = rNum - (reward[x][y] + 10000) / sum
+
+
 def pick(reward, params):
     found = False
     index = np.empty(dtype=int, shape=2)
@@ -70,12 +88,21 @@ def onWin():
     global oldState
     global oldAction
     global wincounter
-    wincounter += 1 #testen ob es an der posotion richtig war
+    wincounter += 1
     evaluate()
     prevReward = Q[oldState]
     prevReward[oldAction[0]][oldAction[1]] = (1 - alpha) * prevReward[oldAction[0]][oldAction[1]] + \
                                              alpha * rewardWin
-    Q[oldState] = prevReward
+    oldState = None
+    oldAction = (None, None)
+
+def onGameover():
+    global oldState
+    global oldAction
+    evaluate()
+    prevReward = Q[oldState]
+    prevReward[oldAction[0]][oldAction[1]] = (1 - alpha) * prevReward[oldAction[0]][oldAction[1]] + \
+                                             alpha * rewardKill
     oldState = None
     oldAction = (None, None)
 
@@ -90,18 +117,6 @@ def evaluate():
         cords.append([gamecounter, (wincounter / intervallsize)])
         save()
         wincounter = 0
-
-
-def onGameover():
-    global oldState
-    global oldAction
-
-    evaluate()
-    prevReward = Q[oldState]
-    prevReward[oldAction[0]][oldAction[1]] = (1 - alpha) * prevReward[oldAction[0]][oldAction[1]] + \
-                                             alpha * rewardKill
-    oldState = None
-    oldAction = (None, None)
 
 
 def paramsToState(params):
@@ -123,12 +138,10 @@ def shouldEmulateMove(params):
     prevReward[oldAction[0]][oldAction[1]] = (1 - alpha) * np.array(prevReward[oldAction[0]][oldAction[1]]) + \
                                              alpha * (rewardAlive + gamma * estReward[pick(estReward, oldParams)[0]][
         pick(estReward, oldParams)[1]])
-    Q[oldState] = prevReward
     oldState = state
     oldParams = params
     pos = pick(estReward, params)
     oldAction = pos
-
     return pos
 
 
