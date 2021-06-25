@@ -85,6 +85,7 @@ def paramsToState(params):
     pass
 
 
+
 def shouldEmulateMove(params):
     # TODO IMPLEMENT THIS METHODE
     #  Die shouldEmulateMove Methode dient dazu den Spieler zu simulieren.
